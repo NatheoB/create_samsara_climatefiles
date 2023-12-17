@@ -10,7 +10,7 @@ write_samsarafile_dailyclimate <- function(data_climate, data_rad,
                                            output_folder) {
   
   ids <- names(data_climate)
-  
+
   fps <- setNames(vector("list", length(ids)), ids)
   for (site in ids) {
     
@@ -63,7 +63,7 @@ write_samsarafile_dailyclimate <- function(data_climate, data_rad,
     data_txt <- paste0("#", header, "\n", data_txt)
     
     # Create folder of the site
-    dir.create(file.path(output_folder, site), showWarnings = FALSE)
+    dir.create(file.path(output_folder, site), recursive = T, showWarnings = FALSE)
     
     # Write
     fps[[site]] <- file.path(output_folder, site, "samsara_daily_climate.txt")

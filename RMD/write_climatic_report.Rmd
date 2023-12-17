@@ -1,0 +1,146 @@
+---
+title: "Visualisation of climate in `r basename(params$files_folder)`"
+output: html_document
+params:
+  files_folder: "output"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+```{r}
+library(vroom)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(cowplot)
+```
+
+```{r}
+data_climate_month <- vroom(file.path(params$files_folder, "samsara_monthly_climate.csv"),
+                            show_col_types = F)
+data_climate_derived <- vroom(file.path(params$files_folder, "samsara_derived_climate.csv"),
+                            show_col_types = F)
+```
+
+```{r, out.width="150%", out.height="150%"}
+plot_sgdd <- ggplot(data_climate_derived,
+       aes(y = sgdd, x = year)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = data_climate_derived$year,
+                     labels = data_climate_derived$year) +
+  geom_smooth(method = "lm", formula = y~x,
+              color = "tan") +
+  labs(title = "Temperatures variable") +
+  ylab("Sum of growing degree-days (°C)") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = .5),
+        axis.ticks = element_line(linewidth = 0.6),
+        axis.line = element_line(linewidth = 0.6),
+        panel.grid = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, angle = 45, vjust = 0.7)) +
+  geom_text(data = 
+              data.frame(
+                label = c("colder", "hotter"),
+                x = mean(data_climate_derived$year),
+                y = c(min(data_climate_derived$sgdd), max(data_climate_derived$sgdd)),
+                vjust = c(0.1, 0.5)),
+            mapping = aes(x=x, y=y, label=label, vjust=vjust), 
+            color = c("deepskyblue2", "salmon"), size = 6)
+
+
+plot_aet2pet <- ggplot(data_climate_derived,
+       aes(y = aet2pet, x = year)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = data_climate_derived$year,
+                     labels = data_climate_derived$year) +
+  geom_smooth(method = "lm", formula = y~x,
+              color = "tan") +
+  labs(title = "Water-stress variable") +
+  ylab("Ratio of actual to potential evapotranspiration") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = .5),
+        axis.ticks = element_line(linewidth = 0.6),
+        axis.line = element_line(linewidth = 0.6),
+        panel.grid = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, angle = 45, vjust = 0.7)) +
+  geom_text(data = 
+              data.frame(
+                label = c("drier", "wetter"),
+                x = mean(data_climate_derived$year),
+                y = c(min(data_climate_derived$aet2pet), max(data_climate_derived$aet2pet)),
+                vjust = c(0.1, 0.5)),
+            mapping = aes(x=x, y=y, label=label, vjust=vjust), 
+            color = c("salmon", "deepskyblue2"), size = 6)
+
+cowplot::plot_grid(
+  plot_sgdd, plot_aet2pet,
+  ncol = 1
+)
+```
+
+
+```{r, out.width="150%", out.height="150%"}
+data_climate_month <- data_climate_month %>% 
+         dplyr::mutate(
+           month_str = case_match(month,
+                                  1 ~ "January", 2 ~ "February", 3 ~"March",
+                                  4 ~ "April", 5 ~ "May", 6 ~ "June", 
+                                  7 ~ "July", 8 ~ "August", 9 ~ "September",
+                                  10 ~ "October", 11 ~ "November", 12 ~ "December"),
+           month_str = factor(month_str, levels = c("January", "February", "March",
+                                                    "April", "May", "June", 
+                                                    "July", "August", "September",
+                                                    "October", "November", "December")))
+
+ggplot(data_climate_month, aes(y = tascorrect, x = year)) +
+  facet_wrap(~month_str) +
+  geom_point() +
+  geom_line() +
+  geom_smooth(method = "lm", formula = y~x,
+              color = "tan") +
+  ylab("temperature in °C") +
+  labs(title = "Evolution of monthly temperatures") +
+  theme(plot.title = element_text(hjust = .5),
+        axis.ticks = element_line(linewidth = 0.6),
+        axis.line = element_line(linewidth = 0.6),
+        panel.grid = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6))
+
+ggplot(data_climate_month %>% 
+         dplyr::select(year, month_str, pr, pet_penman) %>% 
+         tidyr::pivot_longer(!c(year, month_str),
+                             names_to = "var"), 
+       aes(y = value, x = year, color = var)) +
+  scale_color_manual(values =  c("lightsalmon", "deepskyblue1")) +
+  facet_wrap(~month_str) +
+  geom_point() +
+  geom_line() +
+  geom_smooth(method = "lm", formula = y~x) +
+  ylab("amount in mm") +
+  labs(title = "Evolution of monthly precipitations and potential evapotranspiration") +
+  theme(legend.position = "top",
+        plot.title = element_text(hjust = .5),
+        axis.ticks = element_line(linewidth = 0.6),
+        axis.line = element_line(linewidth = 0.6),
+        panel.grid = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6))
+```
+
+

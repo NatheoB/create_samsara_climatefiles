@@ -6,9 +6,10 @@
 #'
 #' @return Return the filepath of the written file
 #' 
-write_samsarafile_derivedclimate <- function(data_sgdd, data_aet2pet) {
+write_samsarafile_derivedclimate <- function(data_sgdd, data_aet2pet,
+                                             output_folder) {
   
-  ids <- names(data_climate)
+  ids <- intersect(names(data_sgdd), names(data_aet2pet))
   
   fps <- setNames(vector("list", length(ids)), ids)
   for (site in ids) {
@@ -20,7 +21,7 @@ write_samsarafile_derivedclimate <- function(data_sgdd, data_aet2pet) {
     )
     
     # Create folder of the site
-    dir.create(file.path(output_folder, site), showWarnings = FALSE)
+    dir.create(file.path(output_folder, site), recursive = T, showWarnings = FALSE)
     
     # Write
     fps[[site]] <- file.path(output_folder, site, "samsara_derived_climate.csv")

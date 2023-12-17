@@ -15,19 +15,14 @@ write_samsarafile_plotinfo <- function(plots_info, output_folder) {
   fps <- setNames(vector("list", nrow(plots_info)), plots_info$id)
   for (site in plots_info$id) {
     
-    # Transform into string
-    plot_info_str <- paste(names(plots_info), plots_info[plots_info$id == site, ],
-                           sep = "\t", collapse = "\n")
-    
     # Create folder of the site
-    dir.create(file.path(output_folder, site), showWarnings = FALSE)
+    dir.create(file.path(output_folder, site), recursive = T, showWarnings = FALSE)
     
     # Write
-    fps[[site]] <- file.path(output_folder, site, "samsara_plot_info.txt")
+    fps[[site]] <- file.path(output_folder, site, "samsara_plot_info.csv")
     
-    fileConn <- file(fps[[site]])
-    writeLines(plot_info_str, fileConn)
-    close(fileConn)
+    write.table(plots_info[plots_info$id == site, ], fps[[site]],
+                sep = ";", dec = ".", row.names = F)
   }
   fps <- dplyr::bind_rows(fps, .id = "id")
   

@@ -13,9 +13,13 @@
 #' 
 compute_aet2pet <- function(data_climate, data_swhc, data_altitude) {
   
-  out_aet2pet <- setNames(vector("list", length(data_climate)), names(data_climate))
+  print("Computing aet2pet...")
+  
+  pb <- txtProgressBar(min = 0, max = length(data_climate), style = 3)
+  i <- 0
   
   # Compute sgdd for each site
+  out_aet2pet <- setNames(vector("list", length(data_climate)), names(data_climate))
   for (site in names(data_climate)) {
   
     # Get info of the plot
@@ -23,7 +27,7 @@ compute_aet2pet <- function(data_climate, data_swhc, data_altitude) {
     altitude <- data_altitude$altitude[data_altitude$id == site]
     
     # For all years excepted the two first (used for burning years of the first target year)
-    years <- order(data_climate[[site]])[-1:2]
+    years <- sort(unique(data_climate[[site]]$year))[-c(1:2)]
     
     out_aet2pet_site <- setNames(vector("list", length(years)), years)
     
@@ -42,35 +46,47 @@ compute_aet2pet <- function(data_climate, data_swhc, data_altitude) {
         for (m in 1:12) {
           
           # Get climatic variables
-          pr <- data_climate[[site]][paste("pr", y, m, sep="_")]
-          pet <- data_climate[[site]][paste("pet_penman", y, m, sep="_")]
-          tas <- data_climate[[site]][paste("tascorrect", y, m, sep="_")]
+          pr <- data_climate[[site]] %>% 
+            dplyr::filter(month == m, year == y) %>% 
+            dplyr::pull(pr)
+          
+          pet <- data_climate[[site]] %>% 
+            dplyr::filter(month == m, year == y) %>% 
+            dplyr::pull(pet_penman)
+          
+          tas <- data_climate[[site]] %>% 
+            dplyr::filter(month == m, year == y) %>% 
+            dplyr::pull(tascorrect)
           
           # Compute the amount of both snow and liquid water (From McCabe and Markstrom)
           out_water <- compute_water_McCandM(tas, pr, snow_storage, altitude)
           snow_storage <- out_water$snow_storage
           
           # Update the soil water content as Piedallu method but with new liquid water from snow and precipitations
-          out_wb <- compute_waterbalance_Piedallu(swc, swhc,
-                                                  out_water$lw, pet,
-                                                  link_function)
+          out_wb <- compute_waterbalance_Piedallu(swc, swhc, out_water$lw, pet)
           swc <- out_wb$swc
           
           # Store aet2pet of the month if year of interest
           if (y == y_target) {
-            out_aet2pet_month[m] <- out_wb$aet2pet
+            out_aet2pet_months[m] <- out_wb$aet2pet
           }
           
         }
       
       }
-      out_aet2pet_site[[year]] <- mean(out_aet2pet_months)
+      out_aet2pet_site[[as.character(y_target)]] <- data.frame(
+        year = y_target,
+        aet2pet = mean(out_aet2pet_months)
+      )
       
     }
-    out_aet2pet[[site]] <- dplyr::bind_rows(out_aet2pet_site, .id = "year") %>% 
-      dplyr::mutate(year = as.integer(year))
+    out_aet2pet[[site]] <- dplyr::bind_rows(out_aet2pet_site)
   
+    # Set progress bar
+    i <- i+1
+    setTxtProgressBar(pb, value = i)
   }
+  close(pb)
   
   return(out_aet2pet)
 }

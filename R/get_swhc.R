@@ -179,7 +179,7 @@ rescale_soilgrids <- function(data_sg) {
 #' @source Panagos et al. 2012
 #' 
 extract_rooting_depth <- function(coords, 
-                                  rast_filepath = "data/STU_EU_DEPTH_ROOTS.rst") {
+                                  rast_filepath = "S:/eu_soil_db/STU_EU_DEPTH_ROOTS.rst") {
   
   # Get raster from filepath
   rast <- terra::rast(rast_filepath)

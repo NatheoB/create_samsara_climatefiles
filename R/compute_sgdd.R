@@ -9,8 +9,12 @@
 #' 
 compute_sgdd <- function(data_climate, sgdd_threshold = 5.5) {
     
-  data_sgdd <- setNames(vector("list", length(names(data_climate))), names(data_climate))
+  print("Computing sgdd...")
   
+  data_sgdd <- setNames(vector("list", length(data_climate)), names(data_climate))
+  
+  pb <- txtProgressBar(min = 0, max = length(data_climate), style = 3)
+  i <- 0
   # Compute sgdd for each site
   for (site in names(data_climate)) {
     
@@ -33,7 +37,13 @@ compute_sgdd <- function(data_climate, sgdd_threshold = 5.5) {
       dplyr::group_by(year) %>% 
       dplyr::summarise(sgdd = sum(gd*n_days))
     
+    # Set progress bar
+    i <- i+1
+    setTxtProgressBar(pb, value = i)
+    
   }
+  # Close progress bar
+  close(pb)
   
   data_sgdd
 }

@@ -63,7 +63,7 @@ write_samsarafile_weather <- function(data_rad,
   for (site in df_str$id) {
     
     # Create folder of the site
-    dir.create(file.path(output_folder, site), showWarnings = FALSE)
+    dir.create(file.path(output_folder, site), recursive = T, showWarnings = FALSE)
     
     # Write
     fps[[site]] <- file.path(output_folder, site, "samsara_weather_file.txt")

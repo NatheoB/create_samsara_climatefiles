@@ -25,8 +25,7 @@
 #' @import lubridate, dplyr, tidyr, purrr, terra, readr, httr
 #' 
 create_samsarafiles_climate <- function(coords,
-                                        output_folder = "output",
-                                        derived_vars = FALSE) {
+                                        output_folder = "output") {
   
   # Store output filepaths
   out_fps <- list()
@@ -53,7 +52,7 @@ create_samsarafiles_climate <- function(coords,
   
   # Create info file for each site in coords
   out_fps[["info"]] <- write_samsarafile_plotinfo(coords_updated,
-                                                  output_folder = "output")
+                                                  output_folder)
   
   
   message("--- RADIATION ---")
@@ -68,7 +67,7 @@ create_samsarafiles_climate <- function(coords,
   
   # Create radiation file for each site in coords 
   out_fps[["radiation"]] <- write_samsarafile_weather(data_rad,
-                                                      output_folder = "output")
+                                                      output_folder = output_folder)
   
   
   message("--- DAILY CLIMATE ---")
@@ -83,15 +82,14 @@ create_samsarafiles_climate <- function(coords,
                                       filepath_worldclim_alt = "S:/WorldClim/wc2.1_30s_elev.tif")
   
   # Create daily climatic file for each site in coords
+  out_fps[["monthly_climate"]] <- write_samsarafile_monthlyclimate(data_climate,
+                                                                   output_folder)
+  
   out_fps[["daily_climate"]] <- write_samsarafile_dailyclimate(data_climate, data_rad,
-                                                               output_folder = "output")
+                                                               output_folder)
   
   
   ### samsara_climate_derived.txt ----
-  
-  # Only if specified
-  if (!derived_vars) {return(out_fps)}
-
   message("--- DERIVED CLIMATE ---")
   
   # Compute sgdd
@@ -102,9 +100,10 @@ create_samsarafiles_climate <- function(coords,
     
     
   # Create derived climatic file for each site in coords
-  out_fps[["derived_climate"]] <- write_samsarafile_derivedclimate(data_sgdd, data_aet2pet)
+  out_fps[["derived_climate"]] <- write_samsarafile_derivedclimate(data_sgdd, data_aet2pet,
+                                                                   output_folder = output_folder)
   
   
   ### Return all the filepaths of created files ---
-  return(fps)
+  return(out_fps)
 }
