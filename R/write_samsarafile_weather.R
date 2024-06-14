@@ -12,7 +12,7 @@ write_samsarafile_weather <- function(data_rad,
                                       doy_start_gs = 1, 
                                       doy_end_gs = 365,
                                       use_turbid_medium = TRUE,
-                                      output_folder = "output") {
+                                      output_folder) {
   
   # Create string output
   df_str <- data_rad %>% 
@@ -58,7 +58,8 @@ write_samsarafile_weather <- function(data_rad,
     # Select variables
     dplyr::select(id, out_str)
   
-  # Write file
+  
+  # Write each plot info into a different folder
   fps <- setNames(vector("list", nrow(df_str)), df_str$id)
   for (site in df_str$id) {
     
@@ -72,6 +73,7 @@ write_samsarafile_weather <- function(data_rad,
     writeLines(df_str$out_str[df_str$id == site], fileConn)
     close(fileConn)
   }
-  fps <- dplyr::bind_rows(fps, .id = "id")
   
+  fps <- dplyr::bind_rows(fps, .id = "id")
+  return(fps)
 }

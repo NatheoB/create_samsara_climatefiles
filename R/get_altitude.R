@@ -27,7 +27,7 @@ get_altitude <- function(coords,
 
   # For all tilenames, import data
   tilenames <- unique(coords_srtm30_tile$tilename)
-  altitudes_list <- list(mode = "list", length = length(tilenames))
+  altitudes_list <- vector(mode = "list", length = length(tilenames))
 
   ntiles <- length(tilenames)
   pb <- txtProgressBar(min = 0, max = ntiles, style = 3)

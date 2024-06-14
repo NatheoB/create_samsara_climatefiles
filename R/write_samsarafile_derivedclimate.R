@@ -8,28 +8,19 @@
 #' 
 write_samsarafile_derivedclimate <- function(data_sgdd, data_aet2pet,
                                              output_folder) {
+  # Bind data sgdd and aet2pet of each plot
+  data_derivedclimate_all <- dplyr::full_join(
+    dplyr::bind_rows(data_sgdd, .id = "id"), 
+    dplyr::bind_rows(data_aet2pet, .id = "id"),
+    by = c("id", "year")
+  )
   
-  ids <- intersect(names(data_sgdd), names(data_aet2pet))
+  # Create output folder
+  dir.create(output_folder, recursive = T, showWarnings = FALSE)
   
-  fps <- setNames(vector("list", length(ids)), ids)
-  for (site in ids) {
-    
-    # Bind sgdd and aet2pet
-    data_derivedclimate <- dplyr::left_join(
-      data_sgdd[[site]], data_aet2pet[[site]],
-      by = "year"
-    )
-    
-    # Create folder of the site
-    dir.create(file.path(output_folder, site), recursive = T, showWarnings = FALSE)
-    
-    # Write
-    fps[[site]] <- file.path(output_folder, site, "samsara_derived_climate.csv")
-    
-    write.table(data_derivedclimate, fps[[site]],
-                sep = ";", dec = ".", row.names = F)
-  }
-  fps <- dplyr::bind_rows(fps, .id = "id")
+  # Write the file
+  fp <- file.path(output_folder, "samsara_derived_climate.csv")
+  write.table(data_derivedclimate_all, fp, sep = ";", dec = ".", row.names = F)
   
-  return(fps)
+  return(fp)
 }

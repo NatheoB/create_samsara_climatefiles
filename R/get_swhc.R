@@ -14,7 +14,6 @@
 #' }
 #'
 get_swhc <- function(coords) {
-
   # Extract SoilGrids data ----
   sg_vars <- c("soc", "clay", "silt") # Not need sand because deduced from clay and silt percentages
   sg_depths <- c("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
@@ -139,26 +138,10 @@ rescale_soilgrids <- function(data_sg) {
   )
   
   # Rescale each column of the soilgrids dataset
-  data_sg_rescaled <- as.data.frame(sapply(names(data_sg %>% 
-                                                   dplyr::select(contains(names(conversion_factor)))), 
-                                           function(X) {
-    # var is the first part of the colname (e.g. cec_0-5cm_mean)
-    var <- strsplit(X, "_")[[1]][1]
-    # value is the third part of the colname (e.g. cec_0-5cm_mean)
-    value <- strsplit(X, "_")[[1]][3]
+  data_sg_rescaled <- data_sg %>% 
+    dplyr::mutate(across(contains("uncertainty"), function(x) {x / 10})) %>% 
+    dplyr::mutate(across(contains("mean"), function(x) {x / conversion_factor[strsplit(cur_column(), "_")[[1]][1]]}))
     
-    if (value == "mean") {
-      # Divide the raw value by the conversion factor for means
-      round(data_sg[,X]/conversion_factor[[var]], digits = 5)
-    } else if (value == "uncertainty") {
-      # Divide by 10
-      round(data_sg[,X]/10, digits = 5)
-    }
-    
-  }))
-  
-  # Rebind id
-  data_sg_rescaled <- cbind(id = data_sg$id, data_sg_rescaled)
   return(data_sg_rescaled)
 }
 
