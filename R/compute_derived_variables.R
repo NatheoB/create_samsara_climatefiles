@@ -10,8 +10,6 @@ compute_derived_variables <- function(data_climate) {
   
   data_derived <- setNames(vector("list", length(data_climate)), names(data_climate))
   
-  pb <- txtProgressBar(min = 0, max = length(data_climate), style = 3)
-  i <- 0
   # Compute sgdd for each site
   for (site in names(data_climate)) {
     
@@ -30,15 +28,10 @@ compute_derived_variables <- function(data_climate) {
         pr_mean = mean(pr),
         pr_month_min = min(pr),
         pr_month_max = max(pr)
-      )
-    
-    # Set progress bar
-    i <- i+1
-    setTxtProgressBar(pb, value = i)
+      ) %>% 
+      dplyr::ungroup()
     
   }
-  # Close progress bar
-  close(pb)
   
   data_derived
 }

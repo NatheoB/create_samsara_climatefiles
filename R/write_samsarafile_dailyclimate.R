@@ -38,8 +38,8 @@ write_samsarafile_dailyclimate <- function(data_climate, data_rad,
       # Transform monthly values into daily ones
       dplyr::arrange(year, month, day) %>% 
       dplyr::mutate(pr = pr/n_days,
-                    pet_turc = pet_monthlymean_mm_rege/ndays,
-                    pet_penman = pet/n_days,
+                    pet_turc = pet_monthlymean_mm_rege/n_days,
+                    pet_penman = pet_penman/n_days,
                     Hrad = Hrad/n_days) %>% 
       
       # Filter dataset

@@ -35,6 +35,7 @@ create_samsarafiles_climate <- function(coords,
                                         create_climate_daily = TRUE,
                                         create_climate_derived = TRUE,
                                         pet_monthlymean_mm_rege = 48,
+                                        input_folder = "S:",
                                         output_folder = "output") {
 
   # Store output filepaths
@@ -46,7 +47,7 @@ create_samsarafiles_climate <- function(coords,
   
   # Get altitude of plots (Server URL: //195.221.110.170/projets/)
   data_altitude <- get_altitude(coords[, c("id", "longitude", "latitude")],
-                                folderpath_srtm30 = "S:/SRTM30")
+                                folderpath_srtm30 = file.path(input_folder, "SRTM30"))
   
   
   # Get soil water holding capacity
@@ -90,9 +91,9 @@ create_samsarafiles_climate <- function(coords,
     # Get climate raw data (Server URL: //195.221.110.170/projets/)
     data_climate <- get_monthly_climate(coords_updated,
                                         vars = c("pr", "pet", "tas"),
-                                        folderpath_chelsa = "S:/envicloud/chelsa/chelsa_V2/GLOBAL/monthly",
-                                        folderpath_lapserate = "S:/lapserate",
-                                        filepath_worldclim_alt = "S:/WorldClim/wc2.1_30s_elev.tif")
+                                        folderpath_chelsa = file.path(input_folder, "envicloud/chelsa/chelsa_V2/GLOBAL/monthly"),
+                                        folderpath_lapserate = file.path(input_folder, "lapserate"),
+                                        filepath_worldclim_alt = file.path(input_folder, "WorldClim/wc2.1_30s_elev.tif"))
     
     
     ### samsara_climate_monthly.csv ----
@@ -124,8 +125,11 @@ create_samsarafiles_climate <- function(coords,
       # Compute aet2pet
       data_aet2pet <- compute_aet2pet(data_climate, data_swhc, data_altitude)
       
+      # Compute classic derived variables 
+      data_derived <- compute_derived_variables(data_climate)
+      
       # Create derived climatic file for each site in coords
-      out_fps[["climate_derived"]] <- write_samsarafile_derivedclimate(data_sgdd, data_aet2pet,
+      out_fps[["climate_derived"]] <- write_samsarafile_derivedclimate(data_sgdd, data_aet2pet, data_derived,
                                                                        output_folder = output_folder)
     }
     

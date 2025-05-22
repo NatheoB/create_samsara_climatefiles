@@ -19,7 +19,6 @@
 #'
 get_altitude <- function(coords,
                          folderpath_srtm30 = "S:/SRTM30") {
-  
   print("Fetching altitudes from SRTM30...")
   
   # Get the name of the SRTM30 tile 

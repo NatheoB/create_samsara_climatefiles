@@ -1,11 +1,12 @@
 #####################################################
 #####################################################
 
-# Create climate files for Benoit's plots in France
+# Create climate files for plots used for fitting samsara allometries
+# (Fuhr and MONTANE databases)
 
 # Script from Natheo Beauchamp
 # beauchamp.natheo@gmail.com
-# 16/12/2023
+# 08/11/2024
 
 # Be careful, you need an internet connection
 # And rasters are stored in INRAE server: //195.221.110.170/projets/
@@ -31,28 +32,33 @@ message_source_files <- sapply(grep("R$", list.files("R", recursive = TRUE), val
                                function(x) source(file.path("R", x)))
 
 # Coordinates of the sites
-output_folder = "output/prenovel"
+output_folder <- "output/fuhr2017"
+data_raw <- vroom("data/coords_fuhr2017.csv")
 
-coords <- data.frame(
-  id = c("prenovel"),
-  longitude = c(5.82765),
-  latitude = c(46.52666),
-  year_min = 1985,
-  year_max = 2018,
-  altitude = c(NA),
-  rooting_depth_m = c(NA),
-  swhc_mm = c(NA)
-)
+coords <- data_raw %>% 
+  dplyr::select(id,
+                longitude = long,
+                latitude = lat,
+                year = year,
+                altitude = elevation) %>% 
+  dplyr::mutate(
+    id = as.character(id),
+    year_min = year - 3,
+    year_max = year,
+    rooting_depth_m = NA,
+    swhc_mm = NA
+  )
 
-# Write climate files for each site
-# And also compute derived climate variables (sgdd and aet2pet)
-fps_files <- create_samsarafiles_climate(coords, 
+
+# Compute derived climate variables (sgdd and aet2pet)
+fps_files <- create_samsarafiles_climate(coords,
                                          create_weather = FALSE,
                                          create_climate_monthly = FALSE,
                                          create_climate_daily = FALSE,
-                                         create_climate_derived = FALSE,
+                                         create_climate_derived = TRUE,
                                          pet_monthlymean_mm_rege = 48,
+                                         input_folder = "S:",
                                          output_folder)
 
-# Create output reports
-# fps_report <- create_climate_reports(output_folder)
+
+
