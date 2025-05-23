@@ -21,13 +21,23 @@ get_altitude <- function(coords,
                          folderpath_srtm30 = "S:/SRTM30") {
   print("Fetching altitudes from SRTM30...")
   
-  # Get the name of the SRTM30 tile 
+  # Get the name of the SRTM30 tile
   coords_srtm30_tile <- find_srtm30_tilenames(coords)
-
-  # For all tilenames, import data
   tilenames <- unique(coords_srtm30_tile$tilename)
+  
+  # Check if data are present for all tiles
+  tilepaths <- paste0(tilenames, ".SRTMGL1.hgt.zip")
+  if (sum(!tilepaths %in% list.files(folderpath_srtm30)) > 0) {
+    stop(
+      paste("ERROR: dowload the missing tile rasters from https://dwtkns.com/srtm30m/ :",
+            paste(tilepaths[!tilepaths %in% list.files(folderpath_srtm30)], collapse = ", ")
+      )
+    )
+  }
+  
+  # For all tilenames, import data
   altitudes_list <- vector(mode = "list", length = length(tilenames))
-
+  
   ntiles <- length(tilenames)
   pb <- txtProgressBar(min = 0, max = ntiles, style = 3)
   

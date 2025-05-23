@@ -31,8 +31,8 @@ message_source_files <- sapply(grep("R$", list.files("R", recursive = TRUE), val
                                function(x) source(file.path("R", x)))
 
 # Coordinates of the sites
+input_folder <- "S:"
 output_folder <- "output/mithila"
-
 data_raw <- vroom("data/mithila_plots/plotinfo_combined_mu.csv")
 
 coords <- data_raw %>% 
@@ -57,7 +57,10 @@ fps_files <- create_samsarafiles_climate(coords,
                                          create_climate_daily = FALSE,
                                          create_climate_derived = TRUE,
                                          pet_monthlymean_mm_rege = 48,
+                                         input_folder,
                                          output_folder)
 
 
+# Create output reports
+fps_report <- create_climate_reports(output_folder)
 

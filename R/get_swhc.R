@@ -38,16 +38,7 @@ get_swhc <- function(coords) {
   
   
   # Extract rooting depth ----
-  data_rooting_depth <- coords %>% 
-    tidyr::drop_na(rooting_depth_m) %>% 
-    dplyr::select(id, rooting_depth_m)
-  
-  if (sum(is.na(coords$rooting_depth_m)) > 0) {
-    data_rooting_depth <- dplyr::bind_rows(
-      data_rooting_depth,
-      extract_rooting_depth(coords %>% dplyr::filter(is.na(rooting_depth_m)))
-    )
-  }
+  data_rooting_depth <- extract_rooting_depth(coords)
   
   
   # Compute soil water holding capacity in proportion for each layer ----

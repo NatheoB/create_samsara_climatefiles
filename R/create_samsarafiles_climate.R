@@ -5,19 +5,19 @@
 #'  \item{"id": }{Unique id of the point (character)}
 #'  \item{"longitude": }{Longitude of the point (WGS84 - epsg:4326 - x coord) (double)}
 #'  \item{"latitude": }{Latitude of the point (WGS84 - epsg:4326 - y coord) (double)}
-#'  \item{"altitude": }{Altitude of the point in m (double) - Can be NA if unknown}
 #' }
 #' @param create_weather If TRUE, create the weather file
 #' @param create_climate_monthly If TRUE, create the monthly climate file
 #' @param create_climate_daily If TRUE, create the daily climate file
 #' @param create_climate_derived If TRUE, create the climate file with derived variables (sgdd and aet2pet)
-#' @param pet_monthlymean_mm_rege Mean of the Turc monthly PET (in mm) (used for Mithila's regeneration models)
+#' @param input_folder Filepath of the folder where the input rasters are stored (character)
 #' @param output_folder Filepath of the folder where to save climatic files (character) 
+#' @param pet_monthlymean_mm_rege Mean of the Turc monthly PET (in mm) (used for Mithila's regeneration models)
 #'
 #' @return Create files in `output_folder` and return filepaths of created files
 #' \itemize{
 #'  \item{samsara_plot_info.csv}{Information of the plot for Samsara2 (swhc, altitude)}
-#'  \item{samsara_weather.txt}{Weather climate file used for SamsaraLight inputs (one per plot)}
+#'  \item{samsara_weather.txt}{Weather climate file used for SamsaraLight inputs (one file per plot)}
 ##'  \item{samsara_climate_monthly.txt}{Monthly climate file with raw climatic data from Chelsa}
 #'  \item{samsara_daily_climate.txt}{Daily climate file with daily radiation and climate data used in 
 #'    output for Samsara2 model (one file per plot)}
@@ -34,9 +34,9 @@ create_samsarafiles_climate <- function(coords,
                                         create_climate_monthly = TRUE,
                                         create_climate_daily = TRUE,
                                         create_climate_derived = TRUE,
-                                        pet_monthlymean_mm_rege = 48,
                                         input_folder = "S:",
-                                        output_folder = "output") {
+                                        output_folder = "output",
+                                        pet_monthlymean_mm_rege = 48) {
 
   # Store output filepaths
   out_fps <- list()
@@ -44,19 +44,18 @@ create_samsarafiles_climate <- function(coords,
   ### samsara_plot_info.txt ----
   # Information of the plot for Samsara2
   message("--- PLOT INFO ---")
-  
+
   # Get altitude of plots (Server URL: //195.221.110.170/projets/)
   data_altitude <- get_altitude(coords[, c("id", "longitude", "latitude")],
                                 folderpath_srtm30 = file.path(input_folder, "SRTM30"))
   
   
   # Get soil water holding capacity
-  data_swhc <- get_swhc(coords[, c("id", "longitude", "latitude", "rooting_depth_m")])
+  data_swhc <- get_swhc(coords[, c("id", "longitude", "latitude")])
   
   
   # Update coords file
   coords_updated <- coords %>% 
-    dplyr::select(-altitude, -rooting_depth_m, -swhc_mm) %>% 
     dplyr::left_join(data_altitude, by = "id") %>% 
     dplyr::left_join(data_swhc, by = "id")
   

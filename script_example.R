@@ -32,9 +32,11 @@ message_source_files <- sapply(grep("R$", list.files("R", recursive = TRUE), val
 
 ##### INPUT DATA #####
 
-# Output folder 
-input_folder <- "S://"
-output_folder <- "output/benoit" # 
+# Input folder where are stored the rasters (climate, altitude...)
+input_folder <- "S:"
+
+# Output folder where to save the files
+output_folder <- "output/example" 
 
 # Information of the sites
 coords <- data.frame(
@@ -42,25 +44,21 @@ coords <- data.frame(
   longitude = c(5.600517626, 5.82765, 0.846398, 5.075669, 5.765170, 5.823752, 5.860935, 6.095338), # WGS84 X coordinate (deg decim)
   latitude = c(45.025232032, 46.52666, 45.871686, 47.735147, 45.290206, 45.579906, 46.284868, 45.201113), # WGS84 Y coordinate (deg decim)
   year_min = rep(1983, times = 8), # Minimum year to compute climatic data (cannot be lower than 1983)
-  year_max = rep(2018, times = 8), # Maximum year to compute climatic data (cannot be greater than 2018)
-  altitude = rep(NA, times = 8), # NOT MANDATORY : altitude in m of the plot, if not given, it will be computed
-  rooting_depth_m = rep(NA, times = 8), # NOT MANDATORY : plot rooting depth in m of the plot, if not given, it will be computed
-  swhc_mm = rep(NA, times = 8) # NOT MANDATORY : soil water holding capacity in mm of the plot, if not given, it will be computed
+  year_max = rep(2018, times = 8) # Maximum year to compute climatic data (cannot be greater than 2018)
 )
 
 
 ##### RUN #####
 
 # Write climate files for each site
-# And also compute derived climate variables (sgdd and aet2pet)
 fps_files <- create_samsarafiles_climate(coords, 
-                                         create_weather = TRUE,
+                                         create_weather = FALSE,
                                          create_climate_monthly = TRUE,
-                                         create_climate_daily = TRUE,
+                                         create_climate_daily = FALSE,
                                          create_climate_derived = TRUE,
-                                         pet_monthlymean_mm_rege = 48,
                                          input_folder,
                                          output_folder)
 
+
 # Create output reports
-# fps_report <- create_climate_reports(output_folder)
+fps_report <- create_climate_reports(output_folder)
