@@ -41,7 +41,7 @@ The main input of the function `create_samsarafiles_climate()` is a data.frame w
 -   The coordinates of each site in WGS84 (longitude/latitude)
 -   The range between which to compute annual variables (minimum and maximum year) (because of the range of the Chelsa climate database, it cannot be lower than 1983 and greater than 2018)
 
-The input data.frame thus must be composed of three columns (id, longitude, latitude, year_min, year_max).
+The input data.frame thus must be composed of five columns (id, longitude, latitude, year_min, year_max).
 
 ## Output files
 
