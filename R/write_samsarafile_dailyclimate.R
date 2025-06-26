@@ -18,7 +18,11 @@ write_samsarafile_dailyclimate <- function(data_climate, data_rad,
     
     climate_file_day <- data_climate[[site]] %>% 
       dplyr::left_join(data_rad %>% dplyr::filter(id == site), by = "month") %>% 
-      dplyr::select(year, month, Hrad, tascorrect, pet_penman = pet_penman, pr) %>% 
+      dplyr::select(year, month, Hrad, tascorrect, pet_penman = pet_penman, pr) %>%
+      
+      # Remove the two first years for each plot 
+      # (corresponding to the two burning years for computing aet2pet)
+      dplyr::filter(year >= min(year)+2) %>% 
       
       # Transform monthly dataframe into daily dataframe
       dplyr::mutate(n_days = days_in_month(lubridate::ym(paste(year, month, sep="_")))) %>% 

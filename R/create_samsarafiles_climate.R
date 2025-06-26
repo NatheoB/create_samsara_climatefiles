@@ -109,6 +109,16 @@ create_samsarafiles_climate <- function(coords,
     if (create_climate_daily) {
       message("- Daily climate -")
       
+      # Because we also fetch radiation data before if create_weather is TRUE
+      if (!create_weather) {
+        # Get radiations from PVGIS
+        data_rad <- get_monthly_rad(coords, 
+                                    start_year = 2005,
+                                    end_year = 2020,
+                                    average_years = TRUE, 
+                                    as_list = FALSE)
+      }
+      
       out_fps[["climate_daily"]] <- write_samsarafile_dailyclimate(data_climate, data_rad,
                                                                    pet_monthlymean_mm_rege,
                                                                    output_folder)

@@ -39,12 +39,20 @@ input_folder <- "S:"
 output_folder <- "output/example" 
 
 # Information of the sites
+# coords <- data.frame(
+#   id = c("prelenfrey", "prenovel", "saillat", "vivey", "col_porte", "col_epine", "pesse", "vaujany"), # Unique id of the plot
+#   longitude = c(5.600517626, 5.82765, 0.846398, 5.075669, 5.765170, 5.823752, 5.860935, 6.095338), # WGS84 X coordinate (deg decim)
+#   latitude = c(45.025232032, 46.52666, 45.871686, 47.735147, 45.290206, 45.579906, 46.284868, 45.201113), # WGS84 Y coordinate (deg decim)
+#   year_min = rep(2017, times = 8), # Minimum year to compute climatic data (cannot be lower than 1983)
+#   year_max = rep(2018, times = 8) # Maximum year to compute climatic data (cannot be greater than 2018)
+# )
+
 coords <- data.frame(
-  id = c("prelenfrey", "prenovel", "saillat", "vivey", "col_porte", "col_epine", "pesse", "vaujany"), # Unique id of the plot
-  longitude = c(5.600517626, 5.82765, 0.846398, 5.075669, 5.765170, 5.823752, 5.860935, 6.095338), # WGS84 X coordinate (deg decim)
-  latitude = c(45.025232032, 46.52666, 45.871686, 47.735147, 45.290206, 45.579906, 46.284868, 45.201113), # WGS84 Y coordinate (deg decim)
-  year_min = rep(2017, times = 8), # Minimum year to compute climatic data (cannot be lower than 1983)
-  year_max = rep(2018, times = 8) # Maximum year to compute climatic data (cannot be greater than 2018)
+  id = "prelenfrey", # Unique id of the plot
+  longitude = 5.600517626, # WGS84 X coordinate (deg decim)
+  latitude = 45.025232032, # WGS84 Y coordinate (deg decim)
+  year_min = 2018, # Minimum year to compute climatic data (cannot be lower than 1983)
+  year_max = 2018 # Maximum year to compute climatic data (cannot be greater than 2018)
 )
 
 
@@ -54,7 +62,7 @@ coords <- data.frame(
 fps_files <- create_samsarafiles_climate(coords, 
                                          create_weather = FALSE,
                                          create_climate_monthly = TRUE,
-                                         create_climate_daily = FALSE,
+                                         create_climate_daily = TRUE,
                                          create_climate_derived = TRUE,
                                          input_folder,
                                          output_folder)
