@@ -51,7 +51,8 @@ create_samsarafiles_climate <- function(coords,
   
   
   # Get soil water holding capacity
-  data_swhc <- get_swhc(coords[, c("id", "longitude", "latitude")])
+  data_swhc <- get_swhc(coords[, c("id", "longitude", "latitude")],
+                        rootingdepth_rast_fp = file.path(input_folder, "eu_soil_db", "STU_EU_DEPTH_ROOTS.rst"))
   
   
   # Update coords file

@@ -13,7 +13,7 @@
 #'  \item{"swhc": }{Soil water holding capacity of the site (in mm)}
 #' }
 #'
-get_swhc <- function(coords) {
+get_swhc <- function(coords, rootingdepth_rast_fp) {
   # Extract SoilGrids data ----
   sg_vars <- c("soc", "clay", "silt") # Not need sand because deduced from clay and silt percentages
   sg_depths <- c("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
@@ -38,7 +38,7 @@ get_swhc <- function(coords) {
   
   
   # Extract rooting depth ----
-  data_rooting_depth <- extract_rooting_depth(coords)
+  data_rooting_depth <- extract_rooting_depth(coords, rootingdepth_rast_fp)
   
   
   # Compute soil water holding capacity in proportion for each layer ----
@@ -152,11 +152,10 @@ rescale_soilgrids <- function(data_sg) {
 #'
 #' @source Panagos et al. 2012
 #' 
-extract_rooting_depth <- function(coords, 
-                                  rast_filepath = "S:/eu_soil_db/STU_EU_DEPTH_ROOTS.rst") {
+extract_rooting_depth <- function(coords, rootingdepth_rast_fp) {
   
   # Get raster from filepath
-  rast <- terra::rast(rast_filepath)
+  rast <- terra::rast(rootingdepth_rast_fp)
   
   ### CONVERT COORDS
   # Get coords in wgs84 proj = long/lat coords
