@@ -59,9 +59,9 @@ write_samsarafile_dailyclimate <- function(data_climate, data_rad,
     
     # Create .txt header
     header <- paste(
-      "year", "day", 
+      "Year", "day", 
       "temperature_C", "precipitation_mm",
-      "globalRadiation_MJ/m2",
+      "globalRadiation_MJ_m2",
       "month_1_12", "pet_Turc_mm", "pet_PenmanMonteith_mm",
       sep="\t"
     )
